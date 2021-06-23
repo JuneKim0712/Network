@@ -11,23 +11,32 @@ DISCONNECT_MESSAGE = "!DISCONNECT"
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(ADDR)
 
-global allConn
+global allConn, allUserName
 allConn = []
-
+allUserName = []
 
 def handel_client(conn, addr):
-    global allConn
+    global allConn, allUserName
     connected = True
-    msg_length = conn.recv(HEADER).decode(FORMAT)
 
-    if msg_length:
-        msg_length = int(msg_length)
-        msg = conn.recv(msg_length).decode(FORMAT)
-        USERNAME = msg
-        print('\n')
-        print(f"{USERNAME} has connected")
-        allConn.append(conn)
-        send(f"{USERNAME} has connected", conn)
+    while True:
+        msg_length = conn.recv(HEADER).decode(FORMAT)
+
+        if msg_length:
+            msg_length = int(msg_length)
+            msg = conn.recv(msg_length).decode(FORMAT)
+            if msg in allUserName:
+                conn.send(('0').encode(FORMAT))
+                continue
+
+            conn.send(('1').encode(FORMAT))
+            allUserName.append(msg)
+            USERNAME = msg
+            print('\n')
+            print(f"{USERNAME} has connected")
+            allConn.append(conn)
+            send(f"{USERNAME} has connected", conn)
+            break
 
     while connected:
         msg_length = conn.recv(HEADER).decode(FORMAT)

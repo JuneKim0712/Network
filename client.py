@@ -29,12 +29,22 @@ def listen():
         print(inMsg + '\n' + '>>> ', end='')
 
 
+
+
+while True:
+    username = input('username: ')
+    send(username)
+    inMsg = client.recv(2 ** 8).decode(FORMAT)
+
+    if inMsg == '1':
+        connection = True
+        break
+    print('The Username is already taken, please type different username')
+    continue
+
 thread = threading.Thread(target=listen)
 thread.start()
 
-username = input('username: ')
-send(username)
-connection = True
 while connection:
     sending = input('>>> ')
     if sending == 'disconnect':
