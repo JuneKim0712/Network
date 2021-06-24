@@ -12,12 +12,13 @@ server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(ADDR)
 
 global allConn, allUserName
-allConn = []
-allUserName = []
+allConn, allUserName = [], []
+
 
 def handel_client(conn, addr):
     global allConn, allUserName
     connected = True
+    return
 
     while True:
         msg_length = conn.recv(HEADER).decode(FORMAT)
@@ -25,6 +26,7 @@ def handel_client(conn, addr):
         if msg_length:
             msg_length = int(msg_length)
             msg = conn.recv(msg_length).decode(FORMAT)
+
             if msg in allUserName:
                 conn.send(('0').encode(FORMAT))
                 continue
@@ -49,22 +51,30 @@ def handel_client(conn, addr):
                 send(f"{USERNAME} has disconnected", conn)
                 connected = False
                 break
+
             print(f"[{USERNAME}: {msg}]")
             send(f"{USERNAME}: {msg}", conn)
 
     conn.close()
+    return
 
 
 def send(message, conn):
     global allConn
+
     conns = allConn.copy()
     conns.remove(conn)
     message = message.encode(FORMAT)
+
     for conn in conns:
         conn.send(message)
+        continue
+    return
+    
 
 
-def start():
+def server_start():
+    print("Starting...")
     server.listen()
     print(f"[Listening] Server is listening on {SERVER}")
 
@@ -74,7 +84,8 @@ def start():
         thread.start()
         print('')
         print(f"[Active Connections]: {threading.activeCount() - 1}")
+        continue
+    return
 
 
-print("Starting...")
-start()
+server_start()

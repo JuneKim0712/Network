@@ -1,6 +1,7 @@
 import socket
 import threading
 
+
 HEADER = 64
 PORT = 5050
 FORMAT = 'utf-8'
@@ -21,33 +22,42 @@ def send(msg):
     send_length += b' ' * (HEADER - len(send_length))
     client.send(send_length)
     client.send(message)
+    return
 
 
 def listen():
     while True:
         inMsg = client.recv(2 ** 16).decode(FORMAT)
         print(inMsg + '\n' + '>>> ', end='')
+        continue
+    return
 
 
+def client_start():
+    while True:
+        username = input('username: ')
+        send(username)
+        inMsg = client.recv(2 ** 8).decode(FORMAT)
 
+        if inMsg == '1':
+            connection = True
+            break
 
-while True:
-    username = input('username: ')
-    send(username)
-    inMsg = client.recv(2 ** 8).decode(FORMAT)
+        print('The Username is already taken, please type different username')
+        continue
 
-    if inMsg == '1':
-        connection = True
-        break
-    print('The Username is already taken, please type different username')
-    continue
+    thread = threading.Thread(target=listen)
+    thread.start()
 
-thread = threading.Thread(target=listen)
-thread.start()
+    while connection:
+        sending = input('>>> ')
 
-while connection:
-    sending = input('>>> ')
-    if sending == 'disconnect':
-        send(DISCONNECT_MESSAGE)
-        break
-    send(sending)
+        if sending == 'disconnect':
+            send(DISCONNECT_MESSAGE)
+            break
+
+        send(sending)
+        continue
+    return
+
+client_start()
