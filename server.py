@@ -7,9 +7,11 @@ SERVER = socket.gethostbyname(socket.gethostname())
 ADDR = (SERVER, PORT)
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!DISCONNECT"
-
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(ADDR)
+#debug mode allows you to debug easily by knowing what events have happened
+debug=False
+
 
 global allConn, allUserName
 allConn, allUserName = [], []
@@ -18,7 +20,6 @@ allConn, allUserName = [], []
 def handel_client(conn, addr):
     global allConn, allUserName
     connected = True
-    return
 
     while True:
         msg_length = conn.recv(HEADER).decode(FORMAT)
@@ -40,8 +41,13 @@ def handel_client(conn, addr):
             send(f"{USERNAME} has connected", conn)
             break
 
+        else:
+            if debug: print('invailed message length on handle_client, first loop')
+            continue
+
     while connected:
         msg_length = conn.recv(HEADER).decode(FORMAT)
+
         if msg_length:
             msg_length = int(msg_length)
             msg = conn.recv(msg_length).decode(FORMAT)
@@ -54,6 +60,9 @@ def handel_client(conn, addr):
 
             print(f"[{USERNAME}: {msg}]")
             send(f"{USERNAME}: {msg}", conn)
+        else:
+            if debug: print('invailed message length on handel_client, second loop')
+            continue
 
     conn.close()
     return
@@ -71,7 +80,6 @@ def send(message, conn):
         continue
     return
     
-
 
 def server_start():
     print("Starting...")

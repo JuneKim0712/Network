@@ -9,9 +9,10 @@ DISCONNECT_MESSAGE = "!DISCONNECT"
 # change it if server is changed
 SERVER = socket.gethostbyname(socket.gethostname())
 ADDR = (SERVER, PORT)
-
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect(ADDR)
+#debug mode allows you to debug easily by knowing what events have happened 
+debug = False
 
 
 def send(msg):
@@ -22,6 +23,7 @@ def send(msg):
     send_length += b' ' * (HEADER - len(send_length))
     client.send(send_length)
     client.send(message)
+    if debug: print('msg sucessfully sended')
     return
 
 
@@ -30,6 +32,7 @@ def listen():
         inMsg = client.recv(2 ** 16).decode(FORMAT)
         print(inMsg + '\n' + '>>> ', end='')
         continue
+    if debug: print('listen closed')
     return
 
 
@@ -46,6 +49,8 @@ def client_start():
         print('The Username is already taken, please type different username')
         continue
 
+    if debug: print('sucessfully sended the username')
+    print('Sucessfully connected to the server')
     thread = threading.Thread(target=listen)
     thread.start()
 
@@ -58,6 +63,8 @@ def client_start():
 
         send(sending)
         continue
+    if debug: print('client_start closed')
     return
+
 
 client_start()
